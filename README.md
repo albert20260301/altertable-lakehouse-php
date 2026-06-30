@@ -18,7 +18,7 @@ composer require altertable/lakehouse-php
 use Altertable\Lakehouse\Config\LakehouseConfig;
 use Altertable\Lakehouse\LakehouseClient;
 use Altertable\Lakehouse\Models\QueryRequest;
-use Altertable\Lakehouse\Models\UpsertMode;
+use Altertable\Lakehouse\Models\UploadMode;
 use Altertable\Lakehouse\Models\ValidateRequest;
 
 $config = LakehouseConfig::builder()
@@ -93,27 +93,30 @@ echo $log->status . ' - ' . ($log->progress * 100) . '%';
 $response = $client->cancelQuery('your-query-id', 'your-session-id');
 ```
 
-### Upsert
+### Upload
 
 ```php
 $csv = "id,name,email\n1,Alice,alice@example.com\n";
 
-$response = $client->upsert(
+$response = $client->upload(
     'my_catalog',
     'my_schema',
     'my_table',
     $csv,
-    UpsertMode::Create,
+    UploadMode::Create,
 );
+```
 
+### Upsert
+
+```php
 // Upsert with primary key
 $response = $client->upsert(
     'my_catalog',
     'my_schema',
     'my_table',
     '[{"id":1,"name":"Alice"}]',
-    UpsertMode::Upsert,
-    primaryKey: 'id',
+    'id',
 );
 ```
 
