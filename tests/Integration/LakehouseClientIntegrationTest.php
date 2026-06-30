@@ -188,9 +188,11 @@ final class LakehouseClientIntegrationTest extends TestCase
         self::assertSame('invalid-data', $response->errorCode);
     }
 
-    public function testQueryInvalidSql(): void
+    public function testValidateInvalidSql(): void
     {
-        $this->expectException(\Altertable\Lakehouse\Exceptions\BadRequestError::class);
-        self::$client->queryAll(new QueryRequest(statement: 'SELECT * FROM'));
+        $response = self::$client->validate(new ValidateRequest('SELECT * FROM'));
+
+        self::assertFalse($response->valid);
+        self::assertNotNull($response->error);
     }
 }
