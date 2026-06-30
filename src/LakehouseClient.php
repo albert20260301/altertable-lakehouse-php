@@ -20,7 +20,7 @@ use Altertable\Lakehouse\Models\QueryLogResponse;
 use Altertable\Lakehouse\Models\QueryMetadata;
 use Altertable\Lakehouse\Models\QueryRequest;
 use Altertable\Lakehouse\Models\QueryResult;
-use Altertable\Lakehouse\Models\UpsertMode;
+use Altertable\Lakehouse\Models\UploadMode;
 use Altertable\Lakehouse\Models\ValidateRequest;
 use Altertable\Lakehouse\Models\ValidateResponse;
 use GuzzleHttp\Client as GuzzleClient;
@@ -194,6 +194,30 @@ final class LakehouseClient
         return CancelQueryResponse::fromArray($this->deserialize($response));
     }
 
+    // ── Upload ────────────────────────────────────────────────────────
+
+    public function upload(
+        string $catalog,
+        string $schema,
+        string $table,
+        string|StreamInterface $body,
+        UploadMode $mode,
+    ): AppendResponse {
+        $query = [
+            'catalog' => $catalog,
+            'schema' => $schema,
+            'table' => $table,
+            'mode' => $mode->value,
+        ];
+
+        $response = $this->send('POST', '/upload', [
+            'query' => $query,
+            'body' => $body,
+        ], 'upload');
+
+        return AppendResponse::fromArray($this->deserialize($response));
+    }
+
     // ── Upsert ────────────────────────────────────────────────────────
 
     public function upsert(
@@ -201,20 +225,14 @@ final class LakehouseClient
         string $schema,
         string $table,
         string|StreamInterface $body,
-        UpsertMode $mode,
-        ?string $primaryKey = null,
+        string $primaryKey,
     ): AppendResponse {
         $query = [
             'catalog' => $catalog,
             'schema' => $schema,
             'table' => $table,
+            'primary_key' => $primaryKey,
         ];
-
-        $query['mode'] = $mode->value;
-
-        if ($primaryKey !== null) {
-            $query['primary_key'] = $primaryKey;
-        }
 
         $response = $this->send('POST', '/upsert', [
             'query' => $query,

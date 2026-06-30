@@ -11,7 +11,7 @@ use Altertable\Lakehouse\Models\ComputeSize;
 use Altertable\Lakehouse\Models\QueryLogResponse;
 use Altertable\Lakehouse\Models\QueryMetadata;
 use Altertable\Lakehouse\Models\QueryRequest;
-use Altertable\Lakehouse\Models\UpsertMode;
+use Altertable\Lakehouse\Models\UploadMode;
 use Altertable\Lakehouse\Models\ValidateRequest;
 use Altertable\Lakehouse\Models\ValidateResponse;
 use PHPUnit\Framework\TestCase;
@@ -25,12 +25,11 @@ final class ModelTest extends TestCase
         self::assertSame('L', ComputeSize::L->value);
     }
 
-    public function testUpsertModeEnum(): void
+    public function testUploadModeEnum(): void
     {
-        self::assertSame('create', UpsertMode::Create->value);
-        self::assertSame('append', UpsertMode::Append->value);
-        self::assertSame('upsert', UpsertMode::Upsert->value);
-        self::assertSame('overwrite', UpsertMode::Overwrite->value);
+        self::assertSame('create', UploadMode::Create->value);
+        self::assertSame('append', UploadMode::Append->value);
+        self::assertSame('overwrite', UploadMode::Overwrite->value);
     }
 
     public function testAppendResponseFromArray(): void

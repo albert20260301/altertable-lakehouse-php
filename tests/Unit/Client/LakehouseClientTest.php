@@ -13,7 +13,7 @@ use Altertable\Lakehouse\Exceptions\SerializationError;
 use Altertable\Lakehouse\Exceptions\TimeoutError;
 use Altertable\Lakehouse\LakehouseClient;
 use Altertable\Lakehouse\Models\QueryRequest;
-use Altertable\Lakehouse\Models\UpsertMode;
+use Altertable\Lakehouse\Models\UploadMode;
 use Altertable\Lakehouse\Models\ValidateRequest;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
@@ -121,14 +121,14 @@ final class LakehouseClientTest extends TestCase
         self::assertTrue($result->ok);
     }
 
-    public function testUpsertCsv(): void
+    public function testUploadCsv(): void
     {
         $body = "id,name\n1,Alice\n";
 
         $mock = $this->createMock(ClientInterface::class);
         $mock->expects(self::once())
             ->method('request')
-            ->with('POST', '/upsert', self::callback(function (array $options) use ($body): bool {
+            ->with('POST', '/upload', self::callback(function (array $options) use ($body): bool {
                 return $options['body'] === $body
                     && !array_key_exists('headers', $options)
                     && !array_key_exists('format', $options['query'])
@@ -137,12 +137,12 @@ final class LakehouseClientTest extends TestCase
             ->willReturn(new Response(200, [], '{"ok":true}'));
 
         $client = new LakehouseClient($this->config, $mock);
-        $result = $client->upsert(
+        $result = $client->upload(
             'cat',
             'sch',
             'tbl',
             $body,
-            UpsertMode::Create,
+            UploadMode::Create,
         );
 
         self::assertTrue($result->ok);
@@ -155,7 +155,7 @@ final class LakehouseClientTest extends TestCase
             ->method('request')
             ->with('POST', '/upsert', self::callback(function (array $options): bool {
                 return ($options['query']['primary_key'] ?? null) === 'id'
-                    && $options['query']['mode'] === 'upsert';
+                    && !array_key_exists('mode', $options['query']);
             }))
             ->willReturn(new Response(200, [], '{"ok":true}'));
 
@@ -165,8 +165,7 @@ final class LakehouseClientTest extends TestCase
             'sch',
             'tbl',
             '{}',
-            UpsertMode::Upsert,
-            primaryKey: 'id',
+            'id',
         );
     }
 

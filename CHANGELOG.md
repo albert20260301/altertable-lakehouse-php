@@ -3,8 +3,8 @@
 ## 0.1.0 (2026-05-14)
 
 - Initial PHP client library for the Altertable Lakehouse API
-- Full endpoint coverage: `append`, `query`, `queryAll`, `getQuery`, `cancelQuery`, `upsert`, `validate`
-- Typed models with PHP 8.1 enums (`ComputeSize`, `UpsertMode`)
+- Full endpoint coverage: `append`, `query`, `queryAll`, `getQuery`, `cancelQuery`, `upload`, `upsert`, `validate`
+- Typed models with PHP 8.1 enums (`ComputeSize`, `UploadMode`)
 - NDJSON streaming for `query` with row iterator
 - Configurable auth support: direct credentials, pre-encoded tokens, and environment variable discovery
 - Typed error hierarchy with retriable classification

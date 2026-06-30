@@ -7,7 +7,7 @@ namespace Altertable\Lakehouse\Tests\Integration;
 use Altertable\Lakehouse\Config\LakehouseConfig;
 use Altertable\Lakehouse\LakehouseClient;
 use Altertable\Lakehouse\Models\QueryRequest;
-use Altertable\Lakehouse\Models\UpsertMode;
+use Altertable\Lakehouse\Models\UploadMode;
 use Altertable\Lakehouse\Models\ValidateRequest;
 use PHPUnit\Framework\TestCase;
 
@@ -152,17 +152,17 @@ final class LakehouseClientIntegrationTest extends TestCase
         self::assertTrue($response->ok || $response->cancelled === true, 'Cancel query should acknowledge the request');
     }
 
-    public function testUpsertCsv(): void
+    public function testUploadCsv(): void
     {
         $csv = "id,name,email\n1,Alice,alice@example.com\n2,Bob,bob@example.com\n";
 
         $this->expectException(\Altertable\Lakehouse\Exceptions\BadRequestError::class);
-        self::$client->upsert(
+        self::$client->upload(
             'test',
             'public',
             'upload_test',
             $csv,
-            UpsertMode::Create,
+            UploadMode::Create,
         );
     }
 
@@ -188,9 +188,11 @@ final class LakehouseClientIntegrationTest extends TestCase
         self::assertSame('invalid-data', $response->errorCode);
     }
 
-    public function testQueryInvalidSql(): void
+    public function testValidateInvalidSql(): void
     {
-        $this->expectException(\Altertable\Lakehouse\Exceptions\BadRequestError::class);
-        self::$client->queryAll(new QueryRequest(statement: 'SELECT INVALID'));
+        $response = self::$client->validate(new ValidateRequest('SELECT * FROM'));
+
+        self::assertFalse($response->valid);
+        self::assertNotNull($response->error);
     }
 }
